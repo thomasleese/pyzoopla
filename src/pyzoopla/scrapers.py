@@ -1,6 +1,8 @@
+from urllib.parse import urljoin, urlparse
+
 from bs4 import BeautifulSoup
 
-from .models import Region, PropertyDetails
+from .models import Region, Property
 
 
 class Scraper:
@@ -9,7 +11,7 @@ class Scraper:
 
     @property
     def canonical_url(self):
-        return self.soup.find("link", rel="canonical")["href"]
+        return self.soup.find("link", rel="canonical")["href"][:-1]
 
     def extract_number(self, text):
         return int("".join([n for n in text if n.isdigit()]))
@@ -31,10 +33,16 @@ class RegionsScraper(Scraper):
         return [self.scrape_row(row) for row in rows[1:]]
 
 
-class PropertiesListScraper(Scraper):
+class PropertyScraper(Scraper):
+    def extract_id(self, url_string):
+        url = urlparse(url_string)
+        return int(url.path.split("/")[3])
+
+
+class PropertiesListScraper(PropertyScraper):
     def scrape_result(self, result):
         href = result.find("a", attrs={"data-testid": "listing-details-link"})["href"]
-        url = f"https://www.zoopla.co.uk{href}".split("?")[0][:-1]
+        url = urljoin("https://www.zoopla.co.uk", href).split("?")[0][:-1]
         address = result.find("p", attrs={"data-testid": "listing-description"}).text
         price = self.extract_number(
             result.find("div", attrs={"data-testid": "listing-price"}).text
@@ -44,8 +52,8 @@ class PropertiesListScraper(Scraper):
             .find_all("div")[0]
             .text
         )
-        return PropertyDetails(
-            url=url, address=address, price=price, number_of_bedrooms=number_of_bedrooms
+        return Property(
+            id=self.extract_id(url), url=url, address=address, price=price, number_of_bedrooms=number_of_bedrooms
         )
 
     def scrape(self):
@@ -53,27 +61,21 @@ class PropertiesListScraper(Scraper):
         return [self.scrape_result(result) for result in results]
 
 
-class PropertyDetailsScraper(Scraper):
-    @property
-    def address(self):
-        return self.soup.find("span", attrs={"data-testid": "address-label"}).text
-
-    @property
-    def price(self):
-        return self.extract_number(
+class PropertyDetailsScraper(PropertyScraper):
+    def scrape(self):
+        url = self.canonical_url
+        address = self.soup.find("span", attrs={"data-testid": "address-label"}).text
+        price = self.extract_number(
             self.soup.find("span", attrs={"data-testid": "price"}).text
         )
-
-    @property
-    def number_of_bedrooms(self):
-        return self.extract_number(
+        number_of_bedrooms = self.extract_number(
             self.soup.find("span", attrs={"data-testid": "beds-label"}).text
         )
 
-    def scrape(self):
-        return PropertyDetails(
-            url=self.canonical_url,
-            address=self.address,
-            price=self.price,
-            number_of_bedrooms=self.number_of_bedrooms,
+        return Property(
+            id=self.extract_id(url),
+            url=url,
+            address=address,
+            price=price,
+            number_of_bedrooms=number_of_bedrooms,
         )

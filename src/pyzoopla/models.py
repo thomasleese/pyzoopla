@@ -8,7 +8,8 @@ class Region(NamedTuple):
     average_price: int
 
 
-class PropertyDetails(NamedTuple):
+class Property(NamedTuple):
+    id: int
     url: str
     address: str
     price: int

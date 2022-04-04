@@ -57,6 +57,7 @@ def test_get_for_sale_properties(zoopla):
 
     assert len(properties) == 25
 
+    assert properties[0].id == 61154032
     assert properties[0].url == "https://www.zoopla.co.uk/for-sale/details/61154032"
     assert properties[0].address == "Selhurst Road, London SE25"
     assert properties[0].price == 375000
@@ -75,6 +76,7 @@ def test_get_to_rent_properties(zoopla):
 
     assert len(properties) == 25
 
+    assert properties[0].id == 61154038
     assert properties[0].url == "https://www.zoopla.co.uk/to-rent/details/61154038"
     assert properties[0].address == "5 Purbeck Gardens, London SE26"
     assert properties[0].price == 1400323
@@ -89,9 +91,10 @@ def test_get_property_details(zoopla):
         body=open("tests/examples/property-details.html").read(),
     )
 
-    property_details = zoopla.get_property_details(61115321)
+    property = zoopla.get_property_details(61115321)
 
-    assert property_details.url == "https://www.zoopla.co.uk/for-sale/details/61115321/"
-    assert property_details.address == "Park Road, Bracknell, Berkshire RG12"
-    assert property_details.price == 600000
-    assert property_details.number_of_bedrooms == 4
+    assert property.id == 61115321
+    assert property.url == "https://www.zoopla.co.uk/for-sale/details/61115321"
+    assert property.address == "Park Road, Bracknell, Berkshire RG12"
+    assert property.price == 600000
+    assert property.number_of_bedrooms == 4
