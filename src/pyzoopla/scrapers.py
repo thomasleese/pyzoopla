@@ -14,6 +14,4 @@ class Scraper:
 
 class PropertyDetailsScraper(Scraper):
     def scrape(self):
-        return PropertyDetails(
-            url=self.canonical_url
-        )
+        return PropertyDetails(url=self.canonical_url)
