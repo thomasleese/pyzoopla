@@ -5,11 +5,23 @@ description = "Library for accessing property information from Zoopla."
 authors = ["Thomas Leese <thomas@leese.io>"]
 
 [tool.poetry.dependencies]
+beautifulsoup4 = "^4.10"
 python = "^3.10"
+requests = "^2.27"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1"
+pytest-cov = "^3.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+skip_covered = true
+show_missing = true
+fail_under = 100
