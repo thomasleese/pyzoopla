@@ -53,7 +53,11 @@ class PropertiesListScraper(PropertyScraper):
             .text
         )
         return Property(
-            id=self.extract_id(url), url=url, address=address, price=price, number_of_bedrooms=number_of_bedrooms
+            id=self.extract_id(url),
+            url=url,
+            address=address,
+            price=price,
+            number_of_bedrooms=number_of_bedrooms,
         )
 
     def scrape(self):
