@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional
+from typing import List, NamedTuple, Optional
 
 
 class ToRentPrice(NamedTuple):
@@ -23,4 +23,5 @@ class Property(NamedTuple):
     url: str
     address: str
     price: Price
+    photos: List[str]
     number_of_bedrooms: int
