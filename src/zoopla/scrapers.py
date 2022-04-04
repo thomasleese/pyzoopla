@@ -1,3 +1,4 @@
+import json
 from typing import List
 from urllib.parse import urljoin, urlparse
 
@@ -13,6 +14,11 @@ class Scraper:
     @property
     def canonical_url(self) -> str:
         return self.soup.find("link", rel="canonical")["href"][:-1]
+
+    @property
+    def linked_data(self) -> dict:
+        script = self.soup.find("script", type="application/ld+json")
+        return json.loads(script.text)
 
     def extract_number(self, text) -> int:
         return int("".join([n for n in text if n.isdigit()]))
@@ -49,12 +55,27 @@ class RegionsScraper(Scraper):
 
 
 class PropertyScraper(Scraper):
+    @property
+    def linked_data_residence(self):
+        for item in self.linked_data["@graph"]:
+            if item["@type"] == "Residence":
+                return item
+        return {}
+
     def extract_id(self, url_string) -> int:
         url = urlparse(url_string)
         return int(url.path.split("/")[3])
 
 
 class PropertiesListScraper(PropertyScraper):
+    @staticmethod
+    def parse_photos_from_gallery(result) -> List[str]:
+        gallery = result.find("div", attrs={"data-testid": "gallery"})
+        if gallery:
+            return [img["src"] for img in gallery.find_all("img")]
+        else:
+            return []
+
     def scrape_result(self, result) -> Property:
         href = result.find("a", attrs={"data-testid": "listing-details-link"})["href"]
         url = urljoin("https://www.zoopla.co.uk", href).split("?")[0][:-1]
@@ -73,6 +94,7 @@ class PropertiesListScraper(PropertyScraper):
             url=url,
             address=address,
             price=price,
+            photos=self.parse_photos_from_gallery(result),
             number_of_bedrooms=number_of_bedrooms,
         )
 
@@ -82,6 +104,15 @@ class PropertiesListScraper(PropertyScraper):
 
 
 class PropertyDetailsScraper(PropertyScraper):
+    @property
+    def photos(self) -> List[str]:
+        try:
+            return [
+                photo["contentUrl"] for photo in self.linked_data_residence["photo"]
+            ]
+        except KeyError:
+            return []
+
     def scrape(self) -> Property:
         url = self.canonical_url
         address = self.soup.find("span", attrs={"data-testid": "address-label"}).text
@@ -97,5 +128,6 @@ class PropertyDetailsScraper(PropertyScraper):
             url=url,
             address=address,
             price=price,
+            photos=self.photos,
             number_of_bedrooms=number_of_bedrooms,
         )
