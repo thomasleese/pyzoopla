@@ -31,6 +31,28 @@ class RegionsScraper(Scraper):
         return [self.scrape_row(row) for row in rows[1:]]
 
 
+class PropertiesListScraper(Scraper):
+    def scrape_result(self, result):
+        href = result.find("a", attrs={"data-testid": "listing-details-link"})["href"]
+        url = f"https://www.zoopla.co.uk{href}".split("?")[0][:-1]
+        address = result.find("p", attrs={"data-testid": "listing-description"}).text
+        price = self.extract_number(
+            result.find("div", attrs={"data-testid": "listing-price"}).text
+        )
+        number_of_bedrooms = self.extract_number(
+            result.find("div", attrs={"data-testid": "listing-spec"})
+            .find_all("div")[0]
+            .text
+        )
+        return PropertyDetails(
+            url=url, address=address, price=price, number_of_bedrooms=number_of_bedrooms
+        )
+
+    def scrape(self):
+        results = self.soup.find_all("div", attrs={"data-testid": "search-result"})
+        return [self.scrape_result(result) for result in results]
+
+
 class PropertyDetailsScraper(Scraper):
     @property
     def address(self):
