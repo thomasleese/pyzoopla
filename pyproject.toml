@@ -3,6 +3,9 @@ name = "pyzoopla"
 version = "0.1.0"
 description = "Library for accessing property information from Zoopla."
 authors = ["Thomas Leese <thomas@leese.io>"]
+packages = [
+    { include = "zoopla", from = "src" }
+]
 
 [tool.poetry.dependencies]
 beautifulsoup4 = "^4.10"

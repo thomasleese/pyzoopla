@@ -1,4 +1,4 @@
-# pyzoopla
+# PyZoopla
 
 Library for accessing property information from Zoopla.
 
@@ -11,7 +11,7 @@ $ pip install pyzoopla
 ## Usage
 
 ```python
-from pyzoopla import Zoopla
+from zoopla import Zoopla
 
 zoopla = Zoopla()
 

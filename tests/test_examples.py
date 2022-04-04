@@ -1,7 +1,7 @@
 import pytest
 import responses
 
-from pyzoopla import Zoopla
+from zoopla import Zoopla
 
 
 @pytest.fixture
