@@ -1,6 +1,6 @@
 import requests
 
-from .scrapers import PropertyDetailsScraper
+from .scrapers import RegionsScraper, PropertyDetailsScraper
 
 
 class Zoopla:
@@ -8,7 +8,17 @@ class Zoopla:
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": "Pyzoopla"})
 
+    def request(self, url):
+        return self.session.get(url).content
+
+    def get_for_sale_regions(self):
+        url = "https://www.zoopla.co.uk/for-sale/"
+        return RegionsScraper(self.request(url)).scrape()
+
+    def get_to_rent_regions(self):
+        url = "https://www.zoopla.co.uk/to-rent/"
+        return RegionsScraper(self.request(url)).scrape()
+
     def get_property_details(self, number):
         url = f"https://www.zoopla.co.uk/for-sale/details/{number}"
-        html_content = self.session.get(url).content
-        return PropertyDetailsScraper(html_content).scrape()
+        return PropertyDetailsScraper(self.request(url)).scrape()
