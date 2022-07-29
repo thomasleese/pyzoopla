@@ -83,11 +83,15 @@ class PropertiesListScraper(PropertyScraper):
         price = self.parse_price(
             result.find("div", attrs={"data-testid": "listing-price"}).text
         )
-        number_of_bedrooms = self.extract_number(
-            result.find("div", attrs={"data-testid": "listing-spec"})
-            .find_all("div")[0]
-            .text
-        )
+
+        try:
+            number_of_bedrooms = self.extract_number(
+                result.find("div", attrs={"data-testid": "listing-spec"})
+                .find_all("div")[0]
+                .text
+            )
+        except IndexError:
+            number_of_bedrooms = 0
 
         return Property(
             id=self.extract_id(url),
