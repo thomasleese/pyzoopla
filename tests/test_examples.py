@@ -53,7 +53,11 @@ def test_get_for_sale_properties(zoopla):
         body=open("tests/examples/for-sale-properties.html").read(),
     )
 
-    properties = zoopla.get_for_sale_properties("london")
+    responses.add(
+        responses.GET, "https://www.zoopla.co.uk/for-sale/property/london?pn=2"
+    )
+
+    properties = zoopla.get_all_for_sale_properties("london")
 
     assert len(properties) == 25
 
@@ -75,7 +79,11 @@ def test_get_to_rent_properties(zoopla):
         body=open("tests/examples/to-rent-properties.html").read(),
     )
 
-    properties = zoopla.get_to_rent_properties("london")
+    responses.add(
+        responses.GET, "https://www.zoopla.co.uk/to-rent/property/london?pn=2"
+    )
+
+    properties = zoopla.get_all_to_rent_properties("london")
 
     assert len(properties) == 25
 
