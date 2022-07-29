@@ -35,7 +35,10 @@ class Scraper:
         elif "pw" in text:
             return Price(to_rent=ToRentPrice(per_week=self.extract_number(text)))
         else:
-            return Price(for_sale=self.extract_number(text))
+            try:
+                return Price(for_sale=self.extract_number(text))
+            except ValueError:
+                return Price()
 
 
 class RegionsScraper(Scraper):
